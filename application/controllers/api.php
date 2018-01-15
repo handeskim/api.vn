@@ -14,8 +14,6 @@ class Api extends REST_Controller {
 	public function Destroy_post(){
 		
 	}
-	
-	
 	public function Convert_post(){
 		
 	}
@@ -24,6 +22,8 @@ class Api extends REST_Controller {
 	}
 
 	public function Transfer_post(){
+		$response = array('');
+		$param = '';
 		if(isset($_POST['token'])){
 			$token = $_POST['token'];
 			$validate = Appscore::validate($token);
@@ -31,21 +31,24 @@ class Api extends REST_Controller {
 				$result = Appscore::decode($token);
 				if(isset($result)){
 					if(isset($_POST['data'])){
-						$data = $_POST['data'];
-						$arrParams = array(
-							'token' => $result,
-							'transfer_to' => $data['transfer_to'],
-							'transfer_point' => $data['transfer_point'],
-						);
-						$resultsTransfers = Appscore::Transfers($arrParams);
+						$userResller = $result->{"userID"};
+						$InfoToken = json_decode($result->{"params"},true);
+						$this->key = $InfoToken['secret_key'];
+						$TransferData = $_POST['data'];
+						$ClientsTransfer = Appscore::TransfersClients($TransferData,$userResller);
 						$RawParams = array(
-							'result' => $resultsTransfers,
+							'data' => $ClientsTransfer,
 						);
 						$SubParam = json_encode($RawParams);
 						$Production_Param = encrypt_key($SubParam,$this->key);
 						$response = array(
 							'msg' => 'Successful',
 							'data' => $Production_Param,
+						);
+					}else{
+						$response = array(
+							'msg' => 'data not exist',
+							'data' => $param,
 						);
 					}
 					
@@ -67,10 +70,9 @@ class Api extends REST_Controller {
 				'data' => $param,
 			);
 		}
-		
 		$this->response($response);
 	}
-
+	/*--------------------------*/
 	public function Register_post(){
 		$response = array('');
 		$param = '';
@@ -392,24 +394,62 @@ class Appscore extends  MY_Controller{
 			return false;
 		}  
 	}
-	public function Transfers($param){
-		if(isset($param)){
-			if(isset($param['transfer_to'])){
-				if(isset($param['transfer_point'])){
-					return $response = array(
-						'data' => $param,
-					);
-					// $email = $params['email'];
-					// $sql = "SELECT * FROM users WHERE clients_code = '$transfer_from' ";
-					// $results_from = Appscore::QueryCoreAll($sql);
-					// if(isset($results_from)){
-
-					// }else{
-					// 	return $response = array(
-					// 		'msg' => 'Missing field transfer_from',
-					// 		'data' => false,
-					// 	);
-					// }
+	public function TransfersClients($TransferData,$userResller){
+		if(isset($TransferData)){
+			if(isset($TransferData['transfer_to'])){
+				if(isset($TransferData['transfer_point'])){
+					$transfer_to = $TransferData['transfer_to'];
+					$sqlClientMoney = "SELECT `score` FROM users WHERE clients_code = '$transfer_to' ";
+					$MoneyClient = Appscore::QueryCoreAll($sqlClientMoney);
+					if(!empty($MoneyClient)){
+						$transfer_point = (int)$TransferData['transfer_point'];
+						$sqlMoney = "SELECT `score` FROM reseller WHERE id_user_reseller = '$userResller' AND score >= $transfer_point ";
+						$MoneyChecks = Appscore::QueryCoreAll($sqlMoney);
+						if(isset($MoneyChecks)){
+							if(!empty($MoneyChecks)){
+								$MoneyReseller = (int)$MoneyChecks[0]["score"];
+								$MoneyOld = (int)$MoneyClient[0]["score"];
+								
+								$MoneyUpdateClients = (int)$MoneyOld +(int)$transfer_point;
+								$MoneyUpdateReseller  = (int)$MoneyReseller - (int)$transfer_point;
+								$ClientsUpdate = array(
+									'id' => $transfer_to,
+									'data' => array('score' => $MoneyUpdateClients,),
+								);
+								$ResellerUpdate = array(
+									'id' => $userResller,
+									'data' => array('score' => $MoneyUpdateReseller,),
+								);
+								$ParamsUpdate = array(
+									'client' => $ClientsUpdate,
+									'reseller' => $ResellerUpdate,
+								);
+								$TransferTransaction = Appscore::UpdateBalance($ParamsUpdate);
+								return $response = array(
+									'data' => $TransferTransaction,
+								);
+							}else{
+								$BalanceSql = "SELECT `score` FROM reseller WHERE id_user_reseller = '$userResller' ";
+								$Balance = Appscore::QueryCoreAll($BalanceSql);
+								return $response = array(
+									'msg' => 'The remaining balance point',
+									'data' => array(
+										'Balance' => $Balance,
+									),
+								);
+							}
+						}else{
+							return $response = array(
+								'msg' => 'The remaining balance point',
+							);
+						}
+						
+					}else{
+						return $response = array(
+							'msg' => 'Missing field transfer_to',
+							'data' => false,
+						);
+					}
 				}else{
 					return $response = array(
 						'msg' => 'Missing field transfer_point',
@@ -418,7 +458,7 @@ class Appscore extends  MY_Controller{
 				}
 			}else{
 				return $response = array(
-					'msg' => 'Missing field transfer_from',
+					'msg' => 'Missing field transfer_to',
 					'data' => false,
 				);
 			}		
@@ -531,6 +571,37 @@ class Appscore extends  MY_Controller{
 		}else{
 			return false;
 		}
+	}
+	public function UpdateBalance($params){
+		try {
+			
+			$reseller = $params['reseller'];
+			$idreseller = $reseller['id'];
+			$dataReseller = $reseller['data'];
+			$scoreReseller = (int)$reseller['data']['score'];
+			
+			$client = $params['client'];
+			$idclient = $client['id'];
+			$dataClient = $client['data'];
+			$this->db = $this->load->database('default', TRUE);
+			$this->db->trans_start();
+			$this->db->where('id_user_reseller', $idreseller);
+			$this->db->where('score >=', $scoreReseller);
+			$resultreseller = $this->db->update('reseller', $dataReseller); 
+			if($resultreseller==true){
+				$this->db->where('clients_code', $idclient);
+				$resultclient = $this->db->update('users', $dataClient); 
+			}
+			$this->db->trans_complete();
+			if($resultreseller==true){
+				return $resultreseller;
+			}else{
+				return $resultclient;
+			}
+			
+		} catch (Exception $e) {
+            return false;
+        }
 	}
 	public function QueryCoreAll($sql){
 		try {

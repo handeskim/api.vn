@@ -94,14 +94,14 @@ class Testcase extends My_Controller {
 			'token' => $this->token_input,
 			'data' => array(
 				'transfer_to' => 'VNP0820',
-				'transfer_Point' => '30000',
+				'transfer_point' => '30000',
 			),
 		);
 		$response = $this->rest->post('/Transfer',$param_Transfer);
-		// $this->key = clients_secret();
-		// $DeCryptReponse = decrypt_key($response->data,$this->key);
-		// var_dump(json_decode($DeCryptReponse,true));
-		var_dump($response);
+		$this->key = clients_secret();
+		$DeCryptReponse = decrypt_key($response->data,$this->key);
+		var_dump(json_decode($DeCryptReponse,true));
+		// var_dump($response);
 	}
 
 }
