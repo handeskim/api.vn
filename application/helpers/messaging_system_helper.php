@@ -92,7 +92,23 @@ if(! function_exists('API_Index_structure')){
 						'Params' => array(
 							'token'=> '(string)',
 							'data' => array(
-								'Account' => 'Client code',
+								'account' => 'Client code',
+							),
+						),
+						'Results' => array(
+							'data' => array(
+								'response' => 'true/false/',
+								'msg' => 'Message notification',
+							),
+						),
+					),
+				'Request_Active' => array(
+						'URL' => base_url().'Active',
+						'PEM' => 'Reseller',
+						'Params' => array(
+							'token'=> '(string)',
+							'data' => array(
+								'account' => 'Client code',
 							),
 						),
 						'Results' => array(
@@ -108,7 +124,7 @@ if(! function_exists('API_Index_structure')){
 						'Params' => array(
 							'token'=> '(string)',
 							'data' => array(
-								'Account' => 'Client code',
+								'account' => 'Client code',
 							),
 						),
 						'Results' => array(

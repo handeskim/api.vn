@@ -104,5 +104,46 @@ class Testcase extends My_Controller {
 		// var_dump($response);
 	}
 
+	public function Pendding(){
+		$param_Transfer = array(
+			'token' => $this->token_input,
+			'data' => array(
+				'account' => 'HK010',
+			),
+		);
+		$response = $this->rest->post('/Pending',$param_Transfer);
+		$this->key = clients_secret();
+		$DeCryptReponse = decrypt_key($response->data,$this->key);
+		var_dump(json_decode($DeCryptReponse,true));
+		// var_dump($response);
+	}
+
+	public function Active(){
+		$param_Transfer = array(
+			'token' => $this->token_input,
+			'data' => array(
+				'account' => 'HK010',
+			),
+		);
+		$response = $this->rest->post('/Active',$param_Transfer);
+		$this->key = clients_secret();
+		$DeCryptReponse = decrypt_key($response->data,$this->key);
+		var_dump(json_decode($DeCryptReponse,true));
+		// var_dump($response);
+	}
+
+	public function Destroy(){
+		$param_Transfer = array(
+			'token' => $this->token_input,
+			'data' => array(
+				'account' => 'VNP08R22',
+			),
+		);
+		$response = $this->rest->post('/Destroy',$param_Transfer);
+		$this->key = clients_secret();
+		$DeCryptReponse = decrypt_key($response->data,$this->key);
+		var_dump(json_decode($DeCryptReponse,true));
+		// var_dump($response);
+	}
 }
 ?>

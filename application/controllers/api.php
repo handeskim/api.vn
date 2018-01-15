@@ -5,22 +5,168 @@ class Api extends REST_Controller {
 	function __construct(){
 		parent::__construct();
 		$this->key = keys();
-		
+		$this->db = $this->load->database('default', TRUE);
 	}
 	
-	public function Pending_post(){
-		
-	}
-	public function Destroy_post(){
-		
-	}
 	public function Convert_post(){
 		
 	}
 	public function History_post(){
 		
 	}
-
+	public function Destroy_post(){
+		$response = array('');
+		$param = '';
+		if(isset($_POST['token'])){
+			$token = $_POST['token'];
+			$validate = Appscore::validate($token);
+			if($validate==true){
+				$result = Appscore::decode($token);
+				if(isset($result)){
+					if(isset($_POST['data'])){
+						$userResller = $result->{"userID"};
+						$InfoToken = json_decode($result->{"params"},true);
+						$this->key = $InfoToken['secret_key'];
+						$clients_code = $_POST['data'];
+						$ClientsTransfer = Appscore::DestroyClients($clients_code,$userResller);
+						$RawParams = array(
+							'data' => $ClientsTransfer,
+						);
+						$SubParam = json_encode($RawParams);
+						$Production_Param = encrypt_key($SubParam,$this->key);
+						$response = array(
+							'msg' => 'Successful',
+							'data' => $Production_Param,
+						);
+					}else{
+						$response = array(
+							'msg' => 'data not exist',
+							'data' => $param,
+						);
+					}
+					
+				}else{
+					$response = array(
+						'msg' => 'An unknown token',
+						'data' => $param,
+					);
+				}
+			}else{
+				$response = array(
+					'msg' => 'Expired Token',
+					'data' => $param,
+				);
+			}
+		}else{
+			$response = array(
+				'msg' => 'Token not exist',
+				'data' => $param,
+			);
+		}
+		$this->response($response);
+	}
+	public function Active_post(){
+		$response = array('');
+		$param = '';
+		if(isset($_POST['token'])){
+			$token = $_POST['token'];
+			$validate = Appscore::validate($token);
+			if($validate==true){
+				$result = Appscore::decode($token);
+				if(isset($result)){
+					if(isset($_POST['data'])){
+						$userResller = $result->{"userID"};
+						$InfoToken = json_decode($result->{"params"},true);
+						$this->key = $InfoToken['secret_key'];
+						$clients_code = $_POST['data'];
+						$ClientsTransfer = Appscore::ActiveClients($clients_code,$userResller);
+						$RawParams = array(
+							'data' => $ClientsTransfer,
+						);
+						$SubParam = json_encode($RawParams);
+						$Production_Param = encrypt_key($SubParam,$this->key);
+						$response = array(
+							'msg' => 'Successful',
+							'data' => $Production_Param,
+						);
+					}else{
+						$response = array(
+							'msg' => 'data not exist',
+							'data' => $param,
+						);
+					}
+					
+				}else{
+					$response = array(
+						'msg' => 'An unknown token',
+						'data' => $param,
+					);
+				}
+			}else{
+				$response = array(
+					'msg' => 'Expired Token',
+					'data' => $param,
+				);
+			}
+		}else{
+			$response = array(
+				'msg' => 'Token not exist',
+				'data' => $param,
+			);
+		}
+		$this->response($response);
+	}
+	public function Pending_post(){
+		$response = array('');
+		$param = '';
+		if(isset($_POST['token'])){
+			$token = $_POST['token'];
+			$validate = Appscore::validate($token);
+			if($validate==true){
+				$result = Appscore::decode($token);
+				if(isset($result)){
+					if(isset($_POST['data'])){
+						$userResller = $result->{"userID"};
+						$InfoToken = json_decode($result->{"params"},true);
+						$this->key = $InfoToken['secret_key'];
+						$clients_code = $_POST['data'];
+						$ClientsTransfer = Appscore::PendingClients($clients_code,$userResller);
+						$RawParams = array(
+							'data' => $ClientsTransfer,
+						);
+						$SubParam = json_encode($RawParams);
+						$Production_Param = encrypt_key($SubParam,$this->key);
+						$response = array(
+							'msg' => 'Successful',
+							'data' => $Production_Param,
+						);
+					}else{
+						$response = array(
+							'msg' => 'data not exist',
+							'data' => $param,
+						);
+					}
+					
+				}else{
+					$response = array(
+						'msg' => 'An unknown token',
+						'data' => $param,
+					);
+				}
+			}else{
+				$response = array(
+					'msg' => 'Expired Token',
+					'data' => $param,
+				);
+			}
+		}else{
+			$response = array(
+				'msg' => 'Token not exist',
+				'data' => $param,
+			);
+		}
+		$this->response($response);
+	}
 	public function Transfer_post(){
 		$response = array('');
 		$param = '';
@@ -394,61 +540,298 @@ class Appscore extends  MY_Controller{
 			return false;
 		}  
 	}
-	public function TransfersClients($TransferData,$userResller){
-		if(isset($TransferData)){
-			if(isset($TransferData['transfer_to'])){
-				if(isset($TransferData['transfer_point'])){
-					$transfer_to = $TransferData['transfer_to'];
-					$sqlClientMoney = "SELECT `score` FROM users WHERE clients_code = '$transfer_to' ";
-					$MoneyClient = Appscore::QueryCoreAll($sqlClientMoney);
-					if(!empty($MoneyClient)){
-						$transfer_point = (int)$TransferData['transfer_point'];
-						$sqlMoney = "SELECT `score` FROM reseller WHERE id_user_reseller = '$userResller' AND score >= $transfer_point ";
-						$MoneyChecks = Appscore::QueryCoreAll($sqlMoney);
-						if(isset($MoneyChecks)){
-							if(!empty($MoneyChecks)){
-								$MoneyReseller = (int)$MoneyChecks[0]["score"];
-								$MoneyOld = (int)$MoneyClient[0]["score"];
-								
-								$MoneyUpdateClients = (int)$MoneyOld +(int)$transfer_point;
-								$MoneyUpdateReseller  = (int)$MoneyReseller - (int)$transfer_point;
-								$ClientsUpdate = array(
-									'id' => $transfer_to,
-									'data' => array('score' => $MoneyUpdateClients,),
-								);
-								$ResellerUpdate = array(
-									'id' => $userResller,
-									'data' => array('score' => $MoneyUpdateReseller,),
-								);
-								$ParamsUpdate = array(
-									'client' => $ClientsUpdate,
-									'reseller' => $ResellerUpdate,
-								);
-								$TransferTransaction = Appscore::UpdateBalance($ParamsUpdate);
-								return $response = array(
-									'data' => $TransferTransaction,
-								);
-							}else{
-								$BalanceSql = "SELECT `score` FROM reseller WHERE id_user_reseller = '$userResller' ";
-								$Balance = Appscore::QueryCoreAll($BalanceSql);
-								return $response = array(
-									'msg' => 'The remaining balance point',
-									'data' => array(
-										'Balance' => $Balance,
-									),
-								);
-							}
+	public function DestroyClients($clients_code,$userResller){
+		if(isset($clients_code)){
+			if(isset($clients_code['account'])){
+				try {
+					$sqlreseller = "SELECT `id` FROM reseller WHERE id_user_reseller = '$userResller'";
+					$ResultReseller = Appscore::QueryCoreAll($sqlreseller);
+					if(isset($ResultReseller)){
+						if(!empty($ResultReseller)){
+							$idreseller = $ResultReseller[0]['id'];
+								$IDclients = $clients_code['account'];
+								$sql = "SELECT * FROM users WHERE clients_code = '$IDclients' AND role = 2 AND reseller = '$idreseller'";
+								$ResultAccount = Appscore::QueryCoreAll($sql);
+								if(isset($ResultAccount)){
+									if(!empty($ResultAccount)){
+										try {
+											$this->db = $this->load->database('default', TRUE);
+											$this->db->trans_start();
+											$this->db->where('role', 2);
+											$this->db->where('clients_code', $IDclients);
+											$this->db->where('reseller', $idreseller);
+											$ReturnDestroy = $this->db->delete('users'); 
+											$this->db->trans_complete();
+											return $response = array(
+												'data' => $ReturnDestroy,
+											);
+										}catch (Exception $e) {
+											return $response = array(
+												'msg' => 'command false',
+												'data' => false,
+											);
+										}
+									}else{
+										return $response = array(
+											'msg' => 'Account false',
+											'data' => false,
+										);
+									}
+								}else{
+									return $response = array(
+										'msg' => 'Account does not exist',
+										'data' => false,
+									);
+								}
+							
 						}else{
 							return $response = array(
-								'msg' => 'The remaining balance point',
+								'msg' => 'You are not an authorized dealer',
+								'data' => false,
 							);
 						}
 						
 					}else{
 						return $response = array(
-							'msg' => 'Missing field transfer_to',
+							'msg' => 'You are not an authorized dealer',
 							'data' => false,
 						);
+					}
+					
+				}catch (Exception $e) {
+					return false;
+				}
+			}else{
+				return $response = array(
+					'msg' => 'Account does not exist',
+					'data' => false,
+				);
+			}
+		}else{
+			return $response = array(
+				'msg' => 'Account does not exist',
+				'data' => false,
+			);
+		}
+	}
+	public function ActiveClients($clients_code,$userResller){
+		if(isset($clients_code)){
+			if(isset($clients_code['account'])){
+				try {
+					$sqlreseller = "SELECT `id` FROM reseller WHERE id_user_reseller = '$userResller'";
+					$ResultReseller = Appscore::QueryCoreAll($sqlreseller);
+					if(isset($ResultReseller)){
+						if(!empty($ResultReseller)){
+							$idreseller = $ResultReseller[0]['id'];
+							$IDclients = $clients_code['account'];
+							
+								$sql = "SELECT * FROM users WHERE clients_code = '$IDclients' AND role = 2 AND reseller = '$idreseller'";
+								$ResultAccount = Appscore::QueryCoreAll($sql);
+								if(isset($ResultAccount)){
+									if(!empty($ResultAccount)){
+										try {
+											$data = array('status' => 1,);
+											$this->db = $this->load->database('default', TRUE);
+											$this->db->trans_start();
+											$this->db->where('role', 2);
+											$this->db->where('clients_code', $IDclients);
+											$this->db->where('reseller', $idreseller);
+											$ReturnUpdate = $this->db->update('users', $data); 
+											$this->db->trans_complete();
+											return $response = array(
+												'data' => $ReturnUpdate,
+											);
+										}catch (Exception $e) {
+											return $response = array(
+												'msg' => 'command false',
+												'data' => false,
+											);
+										}
+									}else{
+										return $response = array(
+											'msg' => 'Account false',
+											'data' => false,
+										);
+									}
+								}else{
+									return $response = array(
+										'msg' => 'Account does not exist',
+										'data' => false,
+									);
+								}
+							
+						}else{
+							return $response = array(
+								'msg' => 'You are not an authorized dealer',
+								'data' => false,
+							);
+						}
+						
+					}else{
+						return $response = array(
+							'msg' => 'You are not an authorized dealer',
+							'data' => false,
+						);
+					}
+					
+				}catch (Exception $e) {
+					return false;
+				}
+			}else{
+				return $response = array(
+					'msg' => 'Account does not exist',
+					'data' => false,
+				);
+			}
+		}else{
+			return $response = array(
+				'msg' => 'Account does not exist',
+				'data' => false,
+			);
+		}
+	}
+	public function PendingClients($clients_code,$userResller){
+		if(isset($clients_code)){
+			if(isset($clients_code['account'])){
+				try {
+					$sqlreseller = "SELECT `id` FROM reseller WHERE id_user_reseller = '$userResller'";
+					$ResultReseller = Appscore::QueryCoreAll($sqlreseller);
+					if(isset($ResultReseller)){
+						if(!empty($ResultReseller)){
+							$idreseller = $ResultReseller[0]['id'];
+							$IDclients = $clients_code['account'];
+							
+								$sql = "SELECT * FROM users WHERE clients_code = '$IDclients' AND role = 2 AND reseller = '$idreseller'";
+								$ResultAccount = Appscore::QueryCoreAll($sql);
+								if(isset($ResultAccount)){
+									if(!empty($ResultAccount)){
+										try {
+											$data = array('status' => 2,);
+											$this->db = $this->load->database('default', TRUE);
+											$this->db->trans_start();
+											$this->db->where('role', 2);
+											$this->db->where('clients_code', $IDclients);
+											$this->db->where('reseller', $idreseller);
+											$ReturnUpdate = $this->db->update('users', $data); 
+											$this->db->trans_complete();
+											return $response = array(
+												'data' => $ReturnUpdate,
+											);
+										}catch (Exception $e) {
+											return $response = array(
+												'msg' => 'command false',
+												'data' => false,
+											);
+										}
+									}else{
+										return $response = array(
+											'msg' => 'Account false',
+											'data' => false,
+										);
+									}
+								}else{
+									return $response = array(
+										'msg' => 'Account does not exist',
+										'data' => false,
+									);
+								}
+							
+						}else{
+							return $response = array(
+								'msg' => 'You are not an authorized dealer',
+								'data' => false,
+							);
+						}
+						
+					}else{
+						return $response = array(
+							'msg' => 'You are not an authorized dealer',
+							'data' => false,
+						);
+					}
+					
+				}catch (Exception $e) {
+					return false;
+				}
+			}else{
+				return $response = array(
+					'msg' => 'Account does not exist',
+					'data' => false,
+				);
+			}
+		}else{
+			return $response = array(
+				'msg' => 'Account does not exist',
+				'data' => false,
+			);
+		}
+	}
+	public function TransfersClients($TransferData,$userResller){
+		if(isset($TransferData)){
+			if(isset($TransferData['transfer_to'])){
+				if(isset($TransferData['transfer_point'])){
+					try {
+						$transfer_to = $TransferData['transfer_to'];
+						$sqlClientMoney = "SELECT `score` FROM users WHERE clients_code = '$transfer_to' ";
+						$MoneyClient = Appscore::QueryCoreAll($sqlClientMoney);
+							if(!empty($MoneyClient)){
+							try {
+								$transfer_point = (int)$TransferData['transfer_point'];
+								$sqlMoney = "SELECT `score` FROM reseller WHERE id_user_reseller = '$userResller' AND score >= $transfer_point ";
+								$MoneyChecks = Appscore::QueryCoreAll($sqlMoney);
+								if(isset($MoneyChecks)){
+									if(!empty($MoneyChecks)){
+										$MoneyReseller = (int)$MoneyChecks[0]["score"];
+										$MoneyOld = (int)$MoneyClient[0]["score"];
+										
+										$MoneyUpdateClients = (int)$MoneyOld +(int)$transfer_point;
+										$MoneyUpdateReseller  = (int)$MoneyReseller - (int)$transfer_point;
+										$ClientsUpdate = array(
+											'id' => $transfer_to,
+											'data' => array('score' => $MoneyUpdateClients,),
+										);
+										$ResellerUpdate = array(
+											'id' => $userResller,
+											'data' => array('score' => $MoneyUpdateReseller,),
+										);
+										$ParamsUpdate = array(
+											'client' => $ClientsUpdate,
+											'reseller' => $ResellerUpdate,
+										);
+										$TransferTransaction = Appscore::UpdateBalance($ParamsUpdate);
+										return $response = array(
+											'data' => $TransferTransaction,
+										);
+									}else{
+										try {
+											$BalanceSql = "SELECT `score` FROM reseller WHERE id_user_reseller = '$userResller' ";
+											$Balance = Appscore::QueryCoreAll($BalanceSql);
+											return $response = array(
+												'msg' => 'The remaining balance point',
+												'data' => array(
+													'Balance' => $Balance,
+												),
+											);
+										}catch (Exception $e) {
+											return false;
+										}
+									}
+								}else{
+									return $response = array(
+										'msg' => 'The remaining balance point',
+									);
+								}
+							}catch (Exception $e) {
+								return false;
+							}
+						}else{
+							return $response = array(
+								'msg' => 'Missing field transfer_to',
+								'data' => false,
+							);
+						}
+					}catch (Exception $e) {
+						return false;
 					}
 				}else{
 					return $response = array(
@@ -470,105 +853,146 @@ class Appscore extends  MY_Controller{
 		}
 	}
 	public function RegisterClient($params){
-		$email = $params['email'];
-		$sql = "SELECT * FROM users WHERE username = '$email' ";
-		$results = Appscore::QueryCoreAll($sql);
-		if(!empty($results)==true){
-			return $response = array(
-				'msg' => 'Account already exists',
-				'data' => $email,
-			);
-		}else{
-			$paramInstall = array(
-				'name' => $params['email'],
-				'username' => $params['email'],
-				'passwords' => $params['passwords'],
-				'level' => 1,
-				'score' => 50,
-				'role' => 2,
-				'status' => 1,
-				'reseller' => $params['reseller'],
-			);
-			
-				$this->db = $this->load->database('default', TRUE);
-				$this->db->trans_start();
-				$this->db->insert('users',$paramInstall);
-				$insert_id = $this->db->insert_id();
-				$this->db->trans_complete();
-				if(isset($insert_id)){
-					$dataUpdate = array(
-						'clients_code' => 'VNP0'.$params['reseller'].$insert_id,
-					);
-					$this->db->where('id', $insert_id);
-					$update = $this->db->update('users', $dataUpdate); 
-					return $response = array(
-						'msg' => 'Registration success',
-						'data' => true,
-					);
+		try {
+			$email = $params['email'];
+			$id_reseller = $params['reseller'];
+			$sql = "SELECT * FROM users WHERE username = '$email' ";
+			$results = Appscore::QueryCoreAll($sql);
+			if(!empty($results)==true){
+				return $response = array(
+					'msg' => 'Account already exists',
+					'data' => $email,
+				);
+			}else{
+				
+				
+				$sqlreseller = "SELECT `id` FROM reseller WHERE id_user_reseller = '$id_reseller'";
+				$ResultReseller = Appscore::QueryCoreAll($sqlreseller);
+				if(isset($ResultReseller)){
+					if(!empty($ResultReseller)){
+						$idreseller = $ResultReseller[0]['id'];
+						$paramInstall = array(
+							'name' => $params['email'],
+							'username' => $params['email'],
+							'passwords' => $params['passwords'],
+							'level' => 1,
+							'score' => 50,
+							'role' => 2,
+							'status' => 1,
+							'reseller' => $idreseller,
+						);
+						try{
+							$this->db = $this->load->database('default', TRUE);
+							$this->db->trans_start();
+							$this->db->insert('users',$paramInstall);
+							$insert_id = $this->db->insert_id();
+							$this->db->trans_complete();
+							if(isset($insert_id)){
+								$dataUpdate = array(
+									'clients_code' => 'VNP0'.$params['reseller'].'R'.$insert_id,
+								);
+								$this->db->where('id', $insert_id);
+								$update = $this->db->update('users', $dataUpdate); 
+								return $response = array(
+									'msg' => 'Registration success',
+									'data' => true,
+								);
+							}else{
+								return $response = array(
+									'msg' => 'Registration failed',
+									'data' => false,
+								);
+							}
+						}catch (Exception $e) {
+							return false;
+						}
+					}else{
+						return $response = array(
+							'msg' => 'Registration failed',
+							'data' => false,
+						);
+					}
 				}else{
 					return $response = array(
-						'msg' => 'Registration failed',
-						'data' => false,
-					);
+							'msg' => 'Registration failed',
+							'data' => false,
+						);
 				}
-			
+			}
+		}catch (Exception $e) {
+			return false;
 		}
 	}
 	public function Reseller_Info($userResller){
-		$sql = "SELECT u.*,r.* ,r.id as id_reseller FROM users u
-		INNER JOIN reseller r ON u.id = r.id_user_reseller
-		WHERE u.id = '$userResller'
-		AND role = 3";
-		$results = Appscore::QueryCoreAll($sql);
-		if(!empty($results)){
-			if(isset($results[0]['id_reseller'])){
-				$id_reseller = $results[0]['id_reseller'];
-				$sqlClientAll = "SELECT * FROM users WHERE reseller = '$id_reseller' and role = 2";
-				$ResultsClientAll = Appscore::QueryCoreAll($sqlClientAll);
-				if(!empty($ResultsClientAll)){
-					return $response = array(
-						'reseller_data' => $results,
-						'reseller_clients_data' => $ResultsClientAll,
-					);
+		try {
+			$sql = "SELECT u.*,r.* ,r.id as id_reseller FROM users u
+			INNER JOIN reseller r ON u.id = r.id_user_reseller
+			WHERE u.id = '$userResller'
+			AND role = 3";
+			$results = Appscore::QueryCoreAll($sql);
+			if(!empty($results)){
+				if(isset($results[0]['id_reseller'])){
+					try {
+						$id_reseller = $results[0]['id_reseller'];
+						$sqlClientAll = "SELECT * FROM users WHERE reseller = '$id_reseller' and role = 2";
+						$ResultsClientAll = Appscore::QueryCoreAll($sqlClientAll);
+						if(!empty($ResultsClientAll)){
+							return $response = array(
+								'reseller_data' => $results,
+								'reseller_clients_data' => $ResultsClientAll,
+							);
+						}else{
+							return false;
+						}
+					}catch (Exception $e) {
+						return false;
+					}
 				}else{
 					return false;
 				}
 			}else{
 				return false;
 			}
-		}else{
+		}catch (Exception $e) {
 			return false;
 		}
 	}
 	public function Clients_Info($ClientID,$userResller){
-		
-		$sql = "SELECT u.*,r.* FROM users u
-		INNER JOIN reseller r ON u.reseller = r.id
-		WHERE u.clients_code = '$ClientID'
-		AND role = 2";
-		$results = Appscore::QueryCoreAll($sql);
-		if(!empty($results)){
-			if(isset($results[0]['id_user_reseller'])){
-				$IdReseller = $results[0]['id_user_reseller'];
-				if($IdReseller==$userResller){
-					return $results;
+		try {
+			$sql = "SELECT u.*,r.* FROM users u
+			INNER JOIN reseller r ON u.reseller = r.id
+			WHERE u.clients_code = '$ClientID'
+			AND role = 2";
+			$results = Appscore::QueryCoreAll($sql);
+			if(!empty($results)){
+				if(isset($results[0]['id_user_reseller'])){
+					$IdReseller = $results[0]['id_user_reseller'];
+					if($IdReseller==$userResller){
+						return $results;
+					}else{
+						return false;
+					}
 				}else{
 					return false;
 				}
 			}else{
 				return false;
 			}
-		}else{
+		}catch (Exception $e) {
 			return false;
 		}
 	}
 	public function Info($userID){
-		$results = '';
-		$sql = "SELECT `id`,`name`,`clients_code`,`username`,`expired`,`role`,`score`,`level`,`reseller` FROM users where `id` = '$userID' ";
-		$results = Appscore::QueryCoreAll($sql);
-		if(isset($results)){
-			return $results;
-		}else{
+		try {
+			$results = '';
+			$sql = "SELECT `id`,`name`,`clients_code`,`username`,`expired`,`role`,`score`,`level`,`reseller` FROM users where `id` = '$userID' ";
+			$results = Appscore::QueryCoreAll($sql);
+			if(isset($results)){
+				return $results;
+			}else{
+				return false;
+			}
+		}catch (Exception $e) {
 			return false;
 		}
 	}
@@ -619,50 +1043,54 @@ class Appscore extends  MY_Controller{
 		return encrypt_key($string,$key);
 	}
 	public function Login($param){
-		$secret_key =  $param['secret_key'];
-		$account =  $param['account'];
-		$password =  md5($param['password']);
-		$sql = "SELECT * FROM users where `username` = '$account' and `passwords` = '$password'";
-		$results = Appscore::QueryCoreAll($sql);
-		if(isset($results)){
-			if(isset($results[0]['status'])){
-				$active = $results[0]['status'];
-				if($active==1){
-					if(isset( $results[0]['id'])){
-						$userID = $results[0]['id'];
-						$params = array(
-							'secret_key' => $secret_key,
-							'params_results' => $results,
-						);
-						$token = Appscore::Initialize_Tokens($userID,json_encode($params));
-						return $response = array(
-							'msg' => 'Successful command',
-							'data' => $token,
-						);
+		try {
+			$secret_key =  $param['secret_key'];
+			$account =  $param['account'];
+			$password =  md5($param['password']);
+			$sql = "SELECT * FROM users where `username` = '$account' and `passwords` = '$password'";
+			$results = Appscore::QueryCoreAll($sql);
+			if(isset($results)){
+				if(isset($results[0]['status'])){
+					$active = $results[0]['status'];
+					if($active==1){
+						if(isset( $results[0]['id'])){
+							$userID = $results[0]['id'];
+							$params = array(
+								'secret_key' => $secret_key,
+								'params_results' => $results,
+							);
+							$token = Appscore::Initialize_Tokens($userID,json_encode($params));
+							return $response = array(
+								'msg' => 'Successful command',
+								'data' => $token,
+							);
+						}else{
+							return $response = array(
+								'msg' => 'Account inactive',
+								'data' => '',
+							);
+						}
 					}else{
 						return $response = array(
-							'msg' => 'Account inactive',
+							'msg' => 'account suspended',
 							'data' => '',
 						);
 					}
 				}else{
 					return $response = array(
-						'msg' => 'account suspended',
+						'msg' => 'Account inactive',
 						'data' => '',
 					);
 				}
 			}else{
 				return $response = array(
-					'msg' => 'Account inactive',
+					'msg' => 'account does not exist',
 					'data' => '',
 				);
 			}
-		}else{
-			return $response = array(
-				'msg' => 'account does not exist',
-				'data' => '',
-			);
-		}
+		} catch (Exception $e) {
+            return false;
+        }
 	}
 	
 	public function Initialize_Tokens($userID,$Params){
