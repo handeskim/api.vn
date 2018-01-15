@@ -10,7 +10,7 @@ class Testcase extends My_Controller {
 		$this->clients_app = clients_app();
 		$config =  array('server' => 'http://api.vn/api',);
 		$this->rest->initialize($config);
-		$this->token_input = "eyJ0eXAiOiJqd3QiLCJhbGciOiJIUzI1NiJ9.eyJjb25zdW1lcktleSI6IjNlM2I2MGNiNDNmN2I1MjFhZTYzMTk1NjY0MDY0OWU2IiwidXNlcklEIjoiOCIsInBhcmFtcyI6IntcInNlY3JldF9rZXlcIjpcIk5hOHNxdlRObmRpdWRSNERlZHRCRVBLVTRIZXVkQnpEZmVDN1g2aDFaZlE1XCIsXCJwYXJhbXNfcmVzdWx0c1wiOlt7XCJpZFwiOlwiOFwiLFwibmFtZVwiOlwiaGFuZGVza1wiLFwiY2xpZW50c19jb2RlXCI6XCJISzAwOFwiLFwidXNlcm5hbWVcIjpcImhhbmRlc2tcIixcInBhc3N3b3Jkc1wiOlwiMmY2ZDIyOGIyN2NiODRlOWZiNGFjNGUwYmEzOTNjOGJcIixcImV4cGlyZWRcIjpcIjIwMTgtMDUtMTJcIixcInNjb3JlXCI6XCIwXCIsXCJyb2xlXCI6XCIzXCIsXCJzdGF0dXNcIjpcIjFcIixcImxldmVsXCI6XCIyXCIsXCJyZXNlbGxlclwiOlwiMFwifV19IiwiaXNzdWVkQXQiOiIyMDE4LTAxLTEzVDE2OjEwOjM4KzA3MDAiLCJ0dGwiOjcyMDB9.jqeiuQVUSFNlBUps2RcSmrGBr3fXd3I8-tcXyuNHV4U";
+		$this->token_input = "eyJ0eXAiOiJqd3QiLCJhbGciOiJIUzI1NiJ9.eyJjb25zdW1lcktleSI6IjNlM2I2MGNiNDNmN2I1MjFhZTYzMTk1NjY0MDY0OWU2IiwidXNlcklEIjoiOCIsInBhcmFtcyI6IntcInNlY3JldF9rZXlcIjpcIk5hOHNxdlRObmRpdWRSNERlZHRCRVBLVTRIZXVkQnpEZmVDN1g2aDFaZlE1XCIsXCJwYXJhbXNfcmVzdWx0c1wiOlt7XCJpZFwiOlwiOFwiLFwibmFtZVwiOlwiaGFuZGVza1wiLFwiY2xpZW50c19jb2RlXCI6XCJISzAwOFwiLFwidXNlcm5hbWVcIjpcImhhbmRlc2tcIixcInBhc3N3b3Jkc1wiOlwiMmY2ZDIyOGIyN2NiODRlOWZiNGFjNGUwYmEzOTNjOGJcIixcImV4cGlyZWRcIjpcIjIwMTgtMDUtMTJcIixcInNjb3JlXCI6XCIwXCIsXCJyb2xlXCI6XCIzXCIsXCJzdGF0dXNcIjpcIjFcIixcImxldmVsXCI6XCIyXCIsXCJyZXNlbGxlclwiOlwiMFwifV19IiwiaXNzdWVkQXQiOiIyMDE4LTAxLTE2VDAyOjI3OjI1KzA3MDAiLCJ0dGwiOjcyMDB9.e-RwpJbX8fCt2o9LbygYKmzXxEC2CpG4tUgiulK9zgw";
 		
 	}
 	public function index(){
@@ -88,5 +88,21 @@ class Testcase extends My_Controller {
 		$DeCryptReponse = decrypt_key($response->data,$this->key);
 		var_dump(json_decode($DeCryptReponse,true));
 	}
+
+	public function Transfer(){
+		$param_Transfer = array(
+			'token' => $this->token_input,
+			'data' => array(
+				'transfer_to' => 'VNP0820',
+				'transfer_Point' => '30000',
+			),
+		);
+		$response = $this->rest->post('/Transfer',$param_Transfer);
+		// $this->key = clients_secret();
+		// $DeCryptReponse = decrypt_key($response->data,$this->key);
+		// var_dump(json_decode($DeCryptReponse,true));
+		var_dump($response);
+	}
+
 }
 ?>

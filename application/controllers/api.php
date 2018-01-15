@@ -14,9 +14,7 @@ class Api extends REST_Controller {
 	public function Destroy_post(){
 		
 	}
-	public function Transfer_post(){
-		
-	}
+	
 	
 	public function Convert_post(){
 		
@@ -24,6 +22,55 @@ class Api extends REST_Controller {
 	public function History_post(){
 		
 	}
+
+	public function Transfer_post(){
+		if(isset($_POST['token'])){
+			$token = $_POST['token'];
+			$validate = Appscore::validate($token);
+			if($validate==true){
+				$result = Appscore::decode($token);
+				if(isset($result)){
+					if(isset($_POST['data'])){
+						$data = $_POST['data'];
+						$arrParams = array(
+							'token' => $result,
+							'transfer_to' => $data['transfer_to'],
+							'transfer_point' => $data['transfer_point'],
+						);
+						$resultsTransfers = Appscore::Transfers($arrParams);
+						$RawParams = array(
+							'result' => $resultsTransfers,
+						);
+						$SubParam = json_encode($RawParams);
+						$Production_Param = encrypt_key($SubParam,$this->key);
+						$response = array(
+							'msg' => 'Successful',
+							'data' => $Production_Param,
+						);
+					}
+					
+				}else{
+					$response = array(
+						'msg' => 'An unknown token',
+						'data' => $param,
+					);
+				}
+			}else{
+				$response = array(
+					'msg' => 'Expired Token',
+					'data' => $param,
+				);
+			}
+		}else{
+			$response = array(
+				'msg' => 'Token not exist',
+				'data' => $param,
+			);
+		}
+		
+		$this->response($response);
+	}
+
 	public function Register_post(){
 		$response = array('');
 		$param = '';
@@ -345,7 +392,43 @@ class Appscore extends  MY_Controller{
 			return false;
 		}  
 	}
-	
+	public function Transfers($param){
+		if(isset($param)){
+			if(isset($param['transfer_to'])){
+				if(isset($param['transfer_point'])){
+					return $response = array(
+						'data' => $param,
+					);
+					// $email = $params['email'];
+					// $sql = "SELECT * FROM users WHERE clients_code = '$transfer_from' ";
+					// $results_from = Appscore::QueryCoreAll($sql);
+					// if(isset($results_from)){
+
+					// }else{
+					// 	return $response = array(
+					// 		'msg' => 'Missing field transfer_from',
+					// 		'data' => false,
+					// 	);
+					// }
+				}else{
+					return $response = array(
+						'msg' => 'Missing field transfer_point',
+						'data' => false,
+					);
+				}
+			}else{
+				return $response = array(
+					'msg' => 'Missing field transfer_from',
+					'data' => false,
+				);
+			}		
+		}else{
+			return $response = array(
+				'msg' => 'Missing field',
+				'data' => false,
+			);
+		}
+	}
 	public function RegisterClient($params){
 		$email = $params['email'];
 		$sql = "SELECT * FROM users WHERE username = '$email' ";

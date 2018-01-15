@@ -73,9 +73,9 @@ if(! function_exists('API_Index_structure')){
 						'Params' => array(
 							'token'=> '(string)',
 							'data' => array(
-								'Auth_Pay' => '(string)',
-								'Transfer_From' => 'Client code',
-								'Transfer_Point' => 'Points transferred',
+								
+								'transfer_to' => 'Client code',
+								'transfer_point' => 'Points transferred',
 							),
 						),
 						'Results' => array(
