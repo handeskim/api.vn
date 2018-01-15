@@ -1,0 +1,128 @@
+Certificate:
+    Data:
+        Version: 3 (0x2)
+        Serial Number: 0 (0x0)
+    Signature Algorithm: sha1WithRSAEncryption
+        Issuer: C=VN, ST=Hanoi, L=Hanoi, O=API VNPHONE, OU=API VNPHONE, CN=Han Desk/emailAddress=handeskim@gmail.com
+        Validity
+            Not Before: Jan 11 23:21:50 2018 GMT
+            Not After : Jan 11 23:21:50 2019 GMT
+        Subject: C=VN, ST=Hanoi, L=Hanoi, O=API VNPHONE, OU=API VNPHONE, CN=Han Desk/emailAddress=handeskim@gmail.com
+        Subject Public Key Info:
+            Public Key Algorithm: rsaEncryption
+                Public-Key: (4096 bit)
+                Modulus:
+                    00:c2:26:3d:e1:3a:ea:dc:7a:70:13:6b:e4:9a:c2:
+                    28:fd:e3:f7:0f:5f:1e:b0:d1:ef:12:96:15:d0:bc:
+                    35:02:96:26:32:ec:93:54:2d:77:b4:f0:c8:86:59:
+                    9b:3c:76:f2:c2:72:50:9e:12:43:68:bf:04:ea:f4:
+                    1f:d0:6d:4e:7a:bd:83:24:9c:5d:4d:8c:0d:2d:92:
+                    96:05:38:f0:c3:98:39:1e:88:d2:8b:4b:82:f6:43:
+                    51:bf:46:ea:88:78:09:d1:75:eb:0d:20:d6:7e:55:
+                    8a:55:3b:b9:86:53:fc:9b:93:fc:39:b8:ec:bc:37:
+                    41:9c:d2:5f:51:92:65:9f:d4:e8:55:e8:2d:4a:c0:
+                    b9:90:f4:10:78:6f:1a:a2:ed:b2:a8:ef:9e:32:39:
+                    52:08:de:39:d9:38:14:fb:99:53:27:57:c2:1e:4c:
+                    81:68:43:76:f0:82:db:c0:5f:6b:a1:2a:1e:ee:a9:
+                    0f:47:9c:6b:ce:70:e2:f6:b4:69:5e:db:db:ea:8b:
+                    98:0f:65:4c:ed:f1:51:8d:ee:1c:e7:f1:fe:e5:fe:
+                    83:5a:b8:52:00:79:fc:6b:06:d1:d3:32:b2:de:13:
+                    1d:f3:86:8e:ac:32:77:a1:b6:27:31:68:97:b2:a0:
+                    f0:3f:21:8b:a6:b2:e4:ee:bf:1d:76:40:de:c4:6a:
+                    10:a5:46:08:4d:10:a4:de:7a:a9:28:61:96:45:2c:
+                    4b:82:ad:93:81:e2:eb:bf:4c:95:57:e4:79:b5:d8:
+                    80:28:a1:71:73:2b:1e:df:7e:8c:97:c5:fd:4e:ff:
+                    d2:9e:42:62:5f:7d:55:df:05:8d:41:d6:b8:8f:75:
+                    2e:a3:4b:f7:fc:23:7e:ff:05:29:8c:7e:57:9d:ac:
+                    a3:03:1a:1b:1e:63:94:14:d4:53:ae:0e:f5:e0:c2:
+                    b0:d8:88:f5:b4:eb:5a:5b:f8:5d:8c:58:0b:9d:8a:
+                    bd:eb:5d:0f:f3:37:46:48:27:31:89:82:2d:14:64:
+                    85:fa:05:b6:51:e1:89:5a:3a:88:05:11:b5:0e:38:
+                    79:38:fb:9e:5f:cb:ae:5c:25:ce:a7:4e:d1:c1:bb:
+                    e6:4d:8d:13:ba:97:a6:6f:8d:a3:dc:6e:3f:5a:fd:
+                    11:4e:a7:75:57:54:2c:02:77:6d:12:03:65:fa:8d:
+                    6b:0e:f1:d2:37:96:d0:8b:fa:dd:a1:15:d4:69:72:
+                    b6:35:8e:04:b8:cc:8e:9a:89:1d:f7:4e:d5:9d:52:
+                    e7:91:9b:95:ae:12:ee:9e:59:f5:72:06:15:fa:70:
+                    36:28:1c:c8:60:80:8b:f9:4e:e9:e4:9b:7f:3e:7d:
+                    3f:07:12:54:3a:77:df:a8:2e:25:aa:14:c7:a1:ad:
+                    33:0a:a3
+                Exponent: 65537 (0x10001)
+        X509v3 extensions:
+            X509v3 Subject Key Identifier: 
+                EC:51:A6:AD:EF:C6:E8:2B:2B:F3:4F:9F:20:13:09:4A:AF:F8:E3:FD
+            X509v3 Authority Key Identifier: 
+                keyid:EC:51:A6:AD:EF:C6:E8:2B:2B:F3:4F:9F:20:13:09:4A:AF:F8:E3:FD
+                DirName:/C=VN/ST=Hanoi/L=Hanoi/O=API VNPHONE/OU=API VNPHONE/CN=Han Desk/emailAddress=handeskim@gmail.com
+                serial:00
+
+            X509v3 Basic Constraints: 
+                CA:TRUE
+    Signature Algorithm: sha1WithRSAEncryption
+         7f:15:af:11:3f:60:c5:80:10:ff:cb:ee:7e:05:4c:82:cb:38:
+         fa:88:9f:28:6b:82:8a:ea:aa:77:fe:e5:36:66:fc:66:75:80:
+         52:fc:84:74:a8:e5:5c:60:a9:12:27:ee:8f:f2:14:06:f1:65:
+         b4:d9:12:ab:e5:f4:42:62:0f:d2:5e:9b:d3:f6:95:0f:a8:7d:
+         e0:6b:21:23:97:94:5f:e4:e8:68:0e:06:7c:54:90:e6:8c:5d:
+         27:d2:e2:81:f7:f2:e3:ce:76:1e:d3:45:f3:2e:d6:c3:dc:ca:
+         0c:89:88:3e:f8:76:f4:02:ab:a8:32:74:35:2e:1b:66:d2:3f:
+         f6:86:cc:24:43:25:21:63:0f:37:97:3f:be:36:07:d3:10:30:
+         8e:67:a8:ce:0d:64:6c:c2:95:a6:51:1f:7a:9c:f6:ec:79:1d:
+         e6:14:84:40:6e:3d:9d:b4:43:89:6e:ce:16:3c:dd:ad:a4:bc:
+         b5:35:c4:48:59:d4:e5:8b:1d:52:1b:23:22:d5:74:5f:04:2e:
+         a7:2a:79:16:c5:7f:76:7c:63:ab:63:42:82:1e:52:f2:a1:03:
+         b8:ef:2d:e1:e4:2f:8f:ed:54:d5:37:37:e7:0d:eb:eb:89:77:
+         95:44:1b:4a:7e:82:ec:96:98:e7:ec:de:2f:1e:f8:22:91:3a:
+         59:27:bb:61:cd:71:82:5d:e0:c6:fb:de:d9:bc:81:42:74:af:
+         fa:91:ca:53:73:a7:9c:58:ce:e0:1f:a1:b2:03:be:f1:2e:86:
+         6f:d6:b0:fe:0e:6d:59:7a:7a:5d:a6:7f:94:bf:ff:82:b3:be:
+         b5:17:76:17:dc:7e:6c:eb:be:7e:ef:2f:7f:e3:86:22:93:b1:
+         ed:d1:69:03:a4:da:06:4f:5e:3d:77:93:bc:1f:25:05:7a:71:
+         e7:27:d2:fa:b0:5f:42:a3:55:09:46:a5:97:a1:22:06:c6:3e:
+         37:f4:d2:3e:ff:5d:4b:21:13:db:01:f4:e7:4e:d9:12:bf:c5:
+         d4:5c:16:57:ec:b9:54:f5:b4:96:d2:6b:11:a0:d9:53:36:c6:
+         ce:e8:87:c8:3d:24:c5:ce:53:52:2c:b7:89:d0:95:3c:b0:ff:
+         20:f5:ed:ab:7e:2e:b7:b2:2c:9f:66:83:12:a2:24:65:9c:6a:
+         36:16:fc:24:d8:a3:6c:af:b0:0b:61:4b:bf:b3:b8:82:dd:7f:
+         db:a0:a2:f8:7b:25:d9:d3:c7:58:41:5c:fd:d3:5d:a2:2f:60:
+         f2:a6:0e:72:04:19:da:33:ea:40:44:4c:e2:39:64:0a:97:33:
+         3e:00:f0:96:84:d7:dc:93:3d:97:66:e2:65:a7:28:f9:95:8c:
+         5f:4a:a4:95:c5:f2:3e:e1
+-----BEGIN CERTIFICATE-----
+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
+PuE=
+-----END CERTIFICATE-----
