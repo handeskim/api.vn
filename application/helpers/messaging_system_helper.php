@@ -10,6 +10,19 @@ if(! function_exists('API_Index_structure')){
 			),
 			'API_structure' => array(
 				
+				'Request_Cached' => array(
+					'URL' => base_url().'Cached',
+					'PEM' => 'ALL',
+					'Params' => array(
+						'token' => '(string)',
+						
+					),
+					'Results' => array(
+						'data' => '(string)',
+					),
+					
+				),
+
 				'Request_Token' => array(
 						'URL' => base_url().'Token',
 						'PEM' => 'ALL',
@@ -67,6 +80,7 @@ if(! function_exists('API_Index_structure')){
 							),
 						),
 					),
+				
 				'Request_Transfer' => array(
 						'URL' => base_url().'Transfer',
 						'PEM' => 'Reseller',

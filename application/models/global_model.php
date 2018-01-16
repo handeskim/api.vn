@@ -91,8 +91,8 @@ class Global_model extends CI_Model{
 		
 	}
 	
-	public function UpdateScroreClients($score){
-		$user_data = $this->session->userdata('data_users');
+	public function UpdateScroreClients($user_data,$score){
+	
 		$userid = $user_data['id'];
 		$this->db->trans_start();
 			$dataUpdate = array('score' => $score,);

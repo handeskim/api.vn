@@ -7,6 +7,21 @@ if(! function_exists('microsecond')){
 		return $s; 
 	}
 }
+if(! function_exists('CONSUMER_KEY')){
+	function CONSUMER_KEY() {
+		 return '3e3b60cb43f7b521ae631956640649e6'; ;
+	}
+}
+if(! function_exists('CONSUMER_SECRET')){
+	function CONSUMER_SECRET() {
+		 return 'GYdW8sg7Y6pOul5iyYPCKOK93qQdgKyOmP7okTWCHpQ0d3SlLLG+DERYic2rMWjofVYjHC7Kn+sM5lgRyo89Tw=='; 
+	}
+}
+if(! function_exists('CONSUMER_TTL')){
+	function CONSUMER_TTL() {
+		 return  7200; 
+	}
+}
 if(! function_exists('keys')){
 	function keys() {
 		 $ci = &get_instance();

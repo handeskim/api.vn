@@ -1,19 +1,265 @@
 <?php if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 require APPPATH . '/libraries/REST_Controller.php';
 class Api extends REST_Controller {
-	
 	function __construct(){
 		parent::__construct();
 		$this->key = keys();
-		$this->db = $this->load->database('default', TRUE);
+		$this->load->model('global_model', 'GlobalMD');	
 	}
 	
-	public function Convert_post(){
-		
-	}
 	public function History_post(){
 		
 	}
+	
+	public function Convert_post(){
+		$response = array('');
+		$param = '';
+		if(isset($_POST['token'])){
+			$TokenPOST = $_POST['token'];
+			$validate = Appscore::validate($TokenPOST);
+			if($validate==true){
+				$Token = Appscore::decode($TokenPOST);
+				if(isset($Token->userID)){
+					if(isset($_POST['data'])){
+						if(!empty($_POST['data'])){
+							$userResller = $Token->{"userID"};
+							$InfoUser = json_decode($Token->{"params"},true);
+							$Clients = $InfoUser['params_results'][0];
+							$ArrayUID = json_decode($_POST['data'],true);
+							$key_pid = md5($TokenPOST);
+							$x = count($ArrayUID);
+							if($x > 5000){
+								$response = array(
+									'msg' => 'UID maximum conversion to 5000 field',
+									'data' => false,
+								);
+							}else{
+								$cached = $this->redis->get($key_pid);
+								if(!empty($cached)){
+									$response = array(
+										'msg' => 'Please remove or refresh Cached and try again',
+										'data' => false,
+									);
+								}else{
+									$params = $this->running_convert($Clients,$key_pid,$ArrayUID);
+									$response = array(
+										'clients' => $Clients["clients_code"],
+										'key_pid' => $key_pid,
+										'data' => $params,
+									);
+									
+								}
+							}
+							
+						}else{
+							$response = array(
+								'msg' => 'data empty',
+								'data' => $param,
+							);
+						}
+					}else{
+						$response = array(
+							'msg' => 'data not exist',
+							'data' => $param,
+						);
+					}
+					
+				}else{
+					$response = array(
+						'msg' => 'Token not exist',
+						'data' => $param,
+					);
+				}
+			}else{
+				$response = array(
+					'msg' => 'Expired Token',
+					'data' => $param,
+				);
+			}
+		}else{
+			$response = array(
+				'msg' => 'Token not exist',
+				'data' => $param,
+			);
+		}
+		$this->response($response);
+		
+	}
+	private function running_convert($user_data,$key_pid,$ArrayConvert){
+		$uid = $user_data['id'];
+		$total_convert ='0';
+		$Percent_convert = 0;
+		$kotimthay ='0';
+		$total_uid = count($ArrayConvert);
+		$this->redis->set($key_pid, json_encode($ArrayConvert));
+		$params = json_decode($this->redis->get($key_pid));
+		$responseQueryConvert = $this->GlobalMD->convert_uid(json_decode($this->redis->get($key_pid)));
+		$this->redis->set('kpr_'.$key_pid, json_encode($responseQueryConvert));
+		$ResultsConvert = $this->ResponseConvertUID($key_pid);
+		$PaymentConvert = $this->PaymentConvert($user_data,$key_pid,$ResultsConvert);
+		$ResultsConvertCompleteUID = $this->ResponseConvertCompleteUID($key_pid);
+		$total_convertComplete = count($ResultsConvertCompleteUID);
+		$total_convert_raw = count($ResultsConvert);
+		$Percent = $total_convert_raw/$total_uid;
+		$total_convert = $total_convertComplete;
+		if(!empty($Percent)){
+			if($Percent > 0){
+				$Percent_convert = round(($Percent*100),1);
+			}
+		}
+		$kotimthay = $total_uid-$total_convert;
+		$uniqueId = uniqid(rand());
+		$history_key_pid = $uid.$key_pid.time().$uniqueId;
+		$this->redis->set($history_key_pid, json_encode($ResultsConvertCompleteUID));
+		$date = date("Y-m-d H:i:s",time());
+		$pkc_save = core_encode('keypc_'.$key_pid);	
+		$history_save = array(
+			'key_pid' =>  $key_pid,
+			'uid' =>  $uid,
+			'his_key_pid' =>  $history_key_pid,
+			'total_uid' =>  (int)number_format($total_uid),
+			'total_transfer' => (int)number_format($total_convert),
+			'percent_transfer' => (string)$Percent_convert,
+			'uid_found' => (int)number_format($kotimthay),
+			'uid_done' => json_encode($ResultsConvertCompleteUID),
+			'pay_transaction' => $PaymentConvert,
+			'history_file' => base_url('excel_export?key='.core_encode($history_key_pid)),
+			'excel_url_realtime' => base_url('excel_export?key='.$pkc_save),
+			'text_url_realtime' => base_url('text_export?key='.$pkc_save),
+			'ip_address' => $this->input->ip_address(),
+			'times' => $date,
+			'renew_history' => time(),
+			'expired_history' => time()+(86400*30),
+			'days_history' => '30',
+		);
+		$this->db->trans_start();
+		$history_setup = $this->db->insert('history', $history_save); 
+		$this->db->trans_complete();
+		
+		return $response = array(
+			'total_uid' =>  (int)number_format($total_uid),
+			'total_transfer' => (int)number_format($total_convert),
+			'percent_transfer' => (string)$Percent_convert,
+			'uid_found' => (int)number_format($kotimthay),
+			'uid_done' => $ResultsConvertCompleteUID,
+			'pay_transaction' => $PaymentConvert,
+			'history_file' => base_url('excel_export?key='.core_encode($history_key_pid)),
+			'excel_url_realtime' => base_url().'excel_export?key='.$pkc_save,
+			'text_url_realtime' => base_url().'text_export?key='.$pkc_save,
+		);
+	}
+	private function ResponseConvertCompleteUID($key_pid){
+		$dump_raw = json_decode($this->redis->get('keypc_'.$key_pid));
+		if(!empty($dump_raw)){
+			return $dump_raw;
+		}else{
+			return 0;
+		}
+	}
+	private function PaymentConvert($user_data,$key_pid,$array){
+		$uid = $user_data['id'];
+		$level = (int)$user_data['level'];
+		$sql = "SELECT `score` FROM `users` WHERE id = '$uid' and `score` > 0";
+		if($level = 1){
+			$query = $this->db->query($sql);
+			$result = $query->result_array();
+			if(isset($result[0]['score'])){
+				$score_old = (int)$result[0]['score'];
+				$score_new = count($array);
+				if((int)$score_new < (int)$score_old){
+					$score_update = (int)$score_old - (int)$score_new;
+					$this->db->trans_start();
+					$dataUpdate = array('score' => $score_update,);
+					$this->db->where('id', $uid);
+					$status = $this->db->update('users', $dataUpdate); 
+					$this->db->trans_complete();
+					$this->redis->set('keypc_'.$key_pid, json_encode($array));
+					return $status;
+				}
+				
+				if((int)$score_new > (int)$score_old){
+					$score_transfer = (int)$score_new - (int)$score_old;
+					$score_update = 0;
+					$this->db->trans_start();
+					$dataUpdate = array('score' => $score_update,);
+					$this->db->where('id', $uid);
+					$status = $this->db->update('users', $dataUpdate); 
+					$this->db->trans_complete();
+					$arrayNewComplete = $this->ConvertArrayToshiff($array,$score_old);
+					$this->redis->set('keypc_'.$key_pid, json_encode($arrayNewComplete));
+					return $status;
+				}
+				
+			}else{
+				$array = array('');
+				$this->redis->set('keypc_'.$key_pid, json_encode($array));
+				$this->redis->set('kpr_'.$key_pid, json_encode($array));
+				return false;
+			}
+		}else{
+			$this->redis->set('keypc_'.$key_pid, json_encode($array));
+			return true;
+		}
+	}
+	private function ConvertArrayToshiff($array,$keys){
+		$arrayNew = array();
+		for($x=0; $x < $keys; $x++){
+			$arrayNew[] = $array[$x];
+		}
+		return $arrayNew;
+	}
+	private function ResponseConvertUID($key_pid){
+		$dump_raw = json_decode($this->redis->get('kpr_'.$key_pid));
+		if(!empty($dump_raw)){
+			return $dump_raw;
+		}else{
+			return 0;
+		}
+	}
+	public function Cached_post(){
+		$response = array('');
+		$param = '';
+		if(isset($_POST['token'])){
+			$TokenPOST = $_POST['token'];
+			$validate = Appscore::validate($TokenPOST);
+			if($validate==true){
+				$key_pid = md5($TokenPOST);
+				$cached = $this->redis->get($key_pid);
+				if(!empty($cached)){
+					$cached = $this->redis->del($key_pid);
+					$cached_response =  $this->redis->del('kpr_'.$key_pid);
+					$cached_response_complete =  $this->redis->del('keypc_'.$key_pid);
+					$response = array(
+						'msg' => 'Please remove or refresh Cached and try again',
+						'data' => array(
+							'cached' => $cached,
+							'cached' => $cached_response,
+							'cached' => $cached_response_complete,
+						),
+					);
+				}else{
+					$response = array(
+						'msg' => 'Cached not exist',
+						'data' => false,
+					);
+					
+				}
+			}else{
+				$response = array(
+					'msg' => 'Expired Token',
+					'data' => $param,
+				);
+			}
+		}else{
+			$response = array(
+				'msg' => 'Token not exist',
+				'data' => $param,
+			);
+		}
+		$this->response($response);
+		
+	}
+	
 	public function Destroy_post(){
 		$response = array('');
 		$param = '';
@@ -531,6 +777,7 @@ class Appscore extends  MY_Controller{
     const CONSUMER_TTL = 7200; 
 	function __construct(){
 		parent::__construct();
+		
 	}
 	public function validate_email($email){
 		$regex = '/^[_a-z0-9-]+(\.[_a-z0-9-]+)*@[a-z0-9-]+(\.[a-z0-9-]+)*(\.[a-z]{2,3})$/'; 
@@ -1099,7 +1346,7 @@ class Appscore extends  MY_Controller{
             'userID' => $userID,
             'params' => $Params,
             'issuedAt' => date(DATE_ISO8601, strtotime("now")),
-            'ttl' => self::CONSUMER_TTL
+            'ttl' => 7200,
         ), self::CONSUMER_SECRET);
         return $token;
     }
@@ -1116,11 +1363,10 @@ class Appscore extends  MY_Controller{
     {
         try {
             $decodeToken = $this->jwt->decode($token, self::CONSUMER_SECRET);
-            
             $ttl_time = strtotime($decodeToken->issuedAt);
             $now_time = strtotime(date(DATE_ISO8601, strtotime("now")));
             if(($now_time - $ttl_time) > $decodeToken->ttl) {
-                throw new Exception('Expired');
+				 return false;
             } else {
                 return true;
             }

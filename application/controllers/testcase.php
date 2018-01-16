@@ -10,7 +10,7 @@ class Testcase extends My_Controller {
 		$this->clients_app = clients_app();
 		$config =  array('server' => 'http://api.vn/api',);
 		$this->rest->initialize($config);
-		$this->token_input = "eyJ0eXAiOiJqd3QiLCJhbGciOiJIUzI1NiJ9.eyJjb25zdW1lcktleSI6IjNlM2I2MGNiNDNmN2I1MjFhZTYzMTk1NjY0MDY0OWU2IiwidXNlcklEIjoiOCIsInBhcmFtcyI6IntcInNlY3JldF9rZXlcIjpcIk5hOHNxdlRObmRpdWRSNERlZHRCRVBLVTRIZXVkQnpEZmVDN1g2aDFaZlE1XCIsXCJwYXJhbXNfcmVzdWx0c1wiOlt7XCJpZFwiOlwiOFwiLFwibmFtZVwiOlwiaGFuZGVza1wiLFwiY2xpZW50c19jb2RlXCI6XCJISzAwOFwiLFwidXNlcm5hbWVcIjpcImhhbmRlc2tcIixcInBhc3N3b3Jkc1wiOlwiMmY2ZDIyOGIyN2NiODRlOWZiNGFjNGUwYmEzOTNjOGJcIixcImV4cGlyZWRcIjpcIjIwMTgtMDUtMTJcIixcInNjb3JlXCI6XCIwXCIsXCJyb2xlXCI6XCIzXCIsXCJzdGF0dXNcIjpcIjFcIixcImxldmVsXCI6XCIyXCIsXCJyZXNlbGxlclwiOlwiMFwifV19IiwiaXNzdWVkQXQiOiIyMDE4LTAxLTE2VDAyOjI3OjI1KzA3MDAiLCJ0dGwiOjcyMDB9.e-RwpJbX8fCt2o9LbygYKmzXxEC2CpG4tUgiulK9zgw";
+		$this->token_input = "eyJ0eXAiOiJqd3QiLCJhbGciOiJIUzI1NiJ9.eyJjb25zdW1lcktleSI6IjNlM2I2MGNiNDNmN2I1MjFhZTYzMTk1NjY0MDY0OWU2IiwidXNlcklEIjoiOCIsInBhcmFtcyI6IntcInNlY3JldF9rZXlcIjpcIk5hOHNxdlRObmRpdWRSNERlZHRCRVBLVTRIZXVkQnpEZmVDN1g2aDFaZlE1XCIsXCJwYXJhbXNfcmVzdWx0c1wiOlt7XCJpZFwiOlwiOFwiLFwibmFtZVwiOlwiaGFuZGVza1wiLFwiY2xpZW50c19jb2RlXCI6XCJISzAwOFwiLFwidXNlcm5hbWVcIjpcImhhbmRlc2tcIixcInBhc3N3b3Jkc1wiOlwiMmY2ZDIyOGIyN2NiODRlOWZiNGFjNGUwYmEzOTNjOGJcIixcImV4cGlyZWRcIjpcIjIwMTgtMDUtMTJcIixcInNjb3JlXCI6XCIwXCIsXCJyb2xlXCI6XCIzXCIsXCJzdGF0dXNcIjpcIjFcIixcImxldmVsXCI6XCIxXCIsXCJyZXNlbGxlclwiOlwiN1wifV19IiwiaXNzdWVkQXQiOiIyMDE4LTAxLTE2VDA3OjA4OjM1KzA3MDAiLCJ0dGwiOjcyMDB9.9kjR67OtCUY550IFk_Yt_MPSW-w7FtuI0zumImqF0A8" ;
 		
 	}
 	public function index(){
@@ -23,7 +23,19 @@ class Testcase extends My_Controller {
 		
 	
 	}
-	
+	public function Convert(){
+		$param_Info = array(
+			'token' => $this->token_input,
+			'data' => json_encode($this->UID()),
+		);
+		$response = $this->rest->post('/Convert',$param_Info);
+		// $this->key = clients_secret();
+		// $DeCryptReponse = decrypt_key($response->data,$this->key);
+		// var_dump(json_decode($DeCryptReponse,true));
+		echo "<pre>";
+		var_dump($response);
+		echo "</pre>";
+	}
 	public function Token(){
 		$param_Encrypt = array(
 			'data' => array(
@@ -44,7 +56,13 @@ class Testcase extends My_Controller {
 		$response = $this->rest->post('/TokenCheck',$param_TokenCheck);
 		var_dump($response);
 	}
-	
+	public function Cached(){
+		$param_TokenCheck = array(
+			'token' => $this->token_input,
+		);
+		$response = $this->rest->post('/Cached',$param_TokenCheck);
+		var_dump($response);
+	}
 	public function Info(){
 		$param_Info = array(
 			'token' => $this->token_input,
@@ -79,7 +97,7 @@ class Testcase extends My_Controller {
 		$param_Info = array(
 			'token' => $this->token_input,
 			'data' => array(
-				'email' => 'handeskim@gmail.com',
+				'email' => 'handeskism@gmail.com',
 				'password' => '1234567890',
 			),
 		);
@@ -87,6 +105,7 @@ class Testcase extends My_Controller {
 		$this->key = clients_secret();
 		$DeCryptReponse = decrypt_key($response->data,$this->key);
 		var_dump(json_decode($DeCryptReponse,true));
+		// var_dump($response);
 	}
 
 	public function Transfer(){
@@ -144,6 +163,23 @@ class Testcase extends My_Controller {
 		$DeCryptReponse = decrypt_key($response->data,$this->key);
 		var_dump(json_decode($DeCryptReponse,true));
 		// var_dump($response);
+	}
+
+	private function UID(){
+		$array = array(
+			'100003199137965',
+			'100005416950881',
+			'100007298405900',
+			'100006700771745',
+			'100004824642488',
+			'100004861119914',
+			'100011290934640',
+			'100006640598632',
+			'100008352873700',
+			'100013266345213',
+		);
+
+		return $array;
 	}
 }
 ?>
