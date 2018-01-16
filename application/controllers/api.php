@@ -1421,13 +1421,14 @@ class Appscore extends  MY_Controller{
     {
         try {
             $decodeToken = $this->jwt->decode($token, self::CONSUMER_SECRET);
-            $ttl_time = strtotime($decodeToken->issuedAt);
-            $now_time = strtotime(date(DATE_ISO8601, strtotime("now")));
-            if(($now_time - $ttl_time) > $decodeToken->ttl) {
-				 return false;
-            } else {
-                return true;
-            }
+			return $decodeToken;
+            // $ttl_time = strtotime($decodeToken->issuedAt);
+            // $now_time = strtotime(date(DATE_ISO8601, strtotime("now")));
+            // if(($now_time - $ttl_time) > $decodeToken->ttl) {
+				 // return false;
+            // } else {
+                // return true;
+            // }
         } catch (Exception $e) {
             return false;
         }

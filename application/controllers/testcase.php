@@ -10,7 +10,7 @@ class Testcase extends My_Controller {
 		$this->clients_app = clients_app();
 		$config =  array('server' => 'http://api.vn/api',);
 		$this->rest->initialize($config);
-		$this->token_input = "eyJ0eXAiOiJqd3QiLCJhbGciOiJIUzI1NiJ9.eyJjb25zdW1lcktleSI6IjNlM2I2MGNiNDNmN2I1MjFhZTYzMTk1NjY0MDY0OWU2IiwidXNlcklEIjoiOCIsInBhcmFtcyI6IntcInNlY3JldF9rZXlcIjpcIk5hOHNxdlRObmRpdWRSNERlZHRCRVBLVTRIZXVkQnpEZmVDN1g2aDFaZlE1XCIsXCJwYXJhbXNfcmVzdWx0c1wiOlt7XCJpZFwiOlwiOFwiLFwibmFtZVwiOlwiaGFuZGVza1wiLFwiY2xpZW50c19jb2RlXCI6XCJISzAwOFwiLFwidXNlcm5hbWVcIjpcImhhbmRlc2tcIixcInBhc3N3b3Jkc1wiOlwiMmY2ZDIyOGIyN2NiODRlOWZiNGFjNGUwYmEzOTNjOGJcIixcImV4cGlyZWRcIjpcIjIwMTgtMDUtMTJcIixcInNjb3JlXCI6XCIwXCIsXCJyb2xlXCI6XCIzXCIsXCJzdGF0dXNcIjpcIjFcIixcImxldmVsXCI6XCIxXCIsXCJyZXNlbGxlclwiOlwiN1wifV19IiwiaXNzdWVkQXQiOiIyMDE4LTAxLTE2VDA3OjA4OjM1KzA3MDAiLCJ0dGwiOjcyMDB9.9kjR67OtCUY550IFk_Yt_MPSW-w7FtuI0zumImqF0A8" ;
+		$this->token_input =  "yJ0eXAiOiJqd3QiLCJhbGciOiJIUzI1NiJ9.eyJjb25zdW1lcktleSI6IjNlM2I2MGNiNDNmN2I1MjFhZTYzMTk1NjY0MDY0OWU2IiwidXNlcklEIjoiOCIsInBhcmFtcyI6IntcInNlY3JldF9rZXlcIjpcIk5hOHNxdlRObmRpdWRSNERlZHRCRVBLVTRIZXVkQnpEZmVDN1g2aDFaZlE1XCIsXCJwYXJhbXNfcmVzdWx0c1wiOlt7XCJpZFwiOlwiOFwiLFwibmFtZVwiOlwiaGFuZGVza1wiLFwiY2xpZW50c19jb2RlXCI6XCJISzAwOFwiLFwidXNlcm5hbWVcIjpcImhhbmRlc2tcIixcInBhc3N3b3Jkc1wiOlwiMmY2ZDIyOGIyN2NiODRlOWZiNGFjNGUwYmEzOTNjOGJcIixcImV4cGlyZWRcIjpcIjIwMTgtMDUtMTJcIixcInNjb3JlXCI6XCI1NDE1XCIsXCJyb2xlXCI6XCIzXCIsXCJzdGF0dXNcIjpcIjFcIixcImxldmVsXCI6XCIxXCIsXCJyZXNlbGxlclwiOlwiN1wifV19IiwiaXNzdWVkQXQiOiIyMDE4LTAxLTE3VDA2OjMzOjQyKzA3MDAiLCJ0dGwiOjcyMDB9.V7tq1UXJIBU1pFmtyTAMh-k9Rbl9NHe3sR2BPEIZgaw" ;
 		
 	}
 	public function index(){
@@ -28,10 +28,10 @@ class Testcase extends My_Controller {
 			'token' => $this->token_input,
 		);
 		$response = $this->rest->post('/History',$param_History);
-		$this->key = clients_secret();
-		$DeCryptReponse = decrypt_key($response->data,$this->key);
-		var_dump(json_decode($DeCryptReponse,true));
-		// var_dump($response);
+		// $this->key = clients_secret();
+		// $DeCryptReponse = decrypt_key($response->data,$this->key);
+		// var_dump(json_decode($DeCryptReponse,true));
+		var_dump($response);
 	}
 	public function Convert(){
 		$param_Info = array(
