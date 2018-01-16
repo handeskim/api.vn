@@ -1352,7 +1352,7 @@ class Appscore extends  MY_Controller{
 			$secret_key =  $param['secret_key'];
 			$account =  $param['account'];
 			$password =  md5($param['password']);
-			$sql = "SELECT * FROM users where `username` = '$account' and `passwords` = '$password'";
+			$sql = "SELECT * FROM users where `username` = '$account' and `passwords` = '$password' and status = 1";
 			$results = Appscore::QueryCoreAll($sql);
 			if(isset($results)){
 				if(isset($results[0]['status'])){
