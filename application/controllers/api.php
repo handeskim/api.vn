@@ -8,7 +8,65 @@ class Api extends REST_Controller {
 	}
 	
 	public function History_post(){
-		
+		$response = array('');
+		$param = '';
+		if(isset($_POST['token'])){
+			$token = $_POST['token'];
+			$validate = Appscore::validate($token);
+			if($validate==true){
+				$result = Appscore::decode($token);
+				if(isset($result)){
+					$userResller = $result->{"userID"};
+					$InfoToken = json_decode($result->{"params"},true);
+					$this->key = $InfoToken['secret_key'];
+					if(isset($InfoToken['params_results'][0])){
+						$userResller = $result->{"userID"};
+						$this->key = $InfoToken['secret_key'];
+						$uid = $InfoToken['params_results'][0]["id"];
+						try{
+							$sql = "SELECT pay_transaction,total_uid,total_transfer,uid_found,times,history_file,his_key_pid,key_pid FROM history WHERE uid = '$uid'";
+							$Params = Appscore::QueryCoreAll($sql);
+							$RawParams = array(
+								'data' => $Params,
+							);
+							$SubParam = json_encode($RawParams);
+							$Production_Param = encrypt_key($SubParam,$this->key);
+							$response = array(
+								'msg' => 'Successful',
+								'data' => $Production_Param,
+							);
+						
+						}catch (Exception $e) {
+							$response = array(
+								'msg' => 'Error Token',
+								'data' => false,
+							);
+						}
+					}else{
+						$response = array(
+							'msg' => 'An unknown token',
+							'data' => $param,
+						);
+					}
+				}else{
+					$response = array(
+						'msg' => 'An unknown token',
+						'data' => $param,
+					);
+				}
+			}else{
+				$response = array(
+					'msg' => 'Expired Token',
+					'data' => $param,
+				);
+			}
+		}else{
+			$response = array(
+				'msg' => 'Token not exist',
+				'data' => $param,
+			);
+		}
+		$this->response($response);
 	}
 	
 	public function Convert_post(){

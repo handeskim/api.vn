@@ -23,6 +23,16 @@ class Testcase extends My_Controller {
 		
 	
 	}
+	public function History(){
+		$param_History = array(
+			'token' => $this->token_input,
+		);
+		$response = $this->rest->post('/History',$param_History);
+		$this->key = clients_secret();
+		$DeCryptReponse = decrypt_key($response->data,$this->key);
+		var_dump(json_decode($DeCryptReponse,true));
+		// var_dump($response);
+	}
 	public function Convert(){
 		$param_Info = array(
 			'token' => $this->token_input,
